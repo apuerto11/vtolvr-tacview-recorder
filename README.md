@@ -44,7 +44,11 @@ VTOL VR names remain unchanged. No Tacview or VTOL VR model files are included.
 
 ## Download and installation
 
-Download the ZIP from [GitHub Releases](https://github.com/kerimala/vtolvr-tacview-recorder/releases).
+Subscribe on the [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3798566504),
+subscribe to the required VTOLAPI item, then refresh the Mod Loader and enable
+both mods for load on start. Disable any older manual recorder copy first.
+
+For manual installation, download the ZIP from [GitHub Releases](https://github.com/kerimala/vtolvr-tacview-recorder/releases).
 Install and enable VTOLAPI in the VTOL VR Mod Loader first.
 
 With VTOL VR and the Mod Loader closed, extract the folder

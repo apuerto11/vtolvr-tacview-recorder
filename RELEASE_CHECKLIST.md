@@ -18,15 +18,30 @@ with one reviewed initial commit; the old Git history is not made public.
 - [x] Document remaining coverage rather than mark untested scenarios passed.
 - [x] Re-run Debug/Release tests (195/195 each) and builds (0 warnings/errors).
 - [x] Verify release ZIP and Workshop staging contain only intended files.
-- [ ] Verify clean public source and GitHub release download.
-- [ ] Upload Workshop item as Hidden, set dependency and test download/load.
-- [ ] Make Workshop item public after the distribution test.
-- [ ] Publish Reddit announcement after a working public download exists.
+- [x] Verify clean public source and GitHub release download.
+- [x] Upload Workshop item as Hidden and add VTOLAPI as a required item.
+- [x] Subscribe/download the Workshop DLL; SHA-256 matches the release DLL.
+- [x] Refresh Mod Manager and verify recorder/VTOLAPI discovery and autostart.
+- [ ] Run a new in-game smoke test using the downloaded Workshop version.
+- [x] Make Workshop item public; verify anonymous access.
+- [ ] Draft the Reddit announcement jointly; the owner will post it personally.
 
 ## Live coverage still requested
 
 Akutan alignment/startup performance; VTOLCannon/GAU-8 live sampling;
 campaign aliases; unknown/custom ship fallback; early exit with pending terrain;
-multiplayer suppression; clean Workshop subscribe/download/load.
+multiplayer suppression; a fresh in-game run using the Workshop installation.
 These are open beta validation targets. A known material recording failure
 must be investigated before expanding distribution.
+
+## Published distribution — 2026-09-09
+
+- GitHub: https://github.com/kerimala/vtolvr-tacview-recorder/releases/tag/v0.5.0-beta.1
+- Workshop: https://steamcommunity.com/sharedfiles/filedetails/?id=3798566504
+- Workshop screenshot: owner-provided Tacview playback image, uploaded and visually checked.
+- Required item: VTOLAPI (`3265689427`).
+- Workshop DLL SHA-256: `8a698e0b8c2d871f133dfbf39f6fc1143c4b796ec622c74c37155701b93680dd`.
+- The previous private recorder autostart was disabled; Workshop recorder and VTOLAPI autostart enabled.
+
+Download integrity and Mod Manager discovery are verified. The earlier successful
+flight was from the private test build; no new Workshop runtime test is claimed.
