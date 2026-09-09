@@ -1,0 +1,104 @@
+name: Feature request
+description: Suggest a focused improvement for the VTOL VR single-player recorder.
+title: "[Feature]: "
+labels:
+  - enhancement
+  - community-request
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea. Please search existing issues first and describe one focused improvement per request.
+
+        The recorder is intentionally **single-player only**. Requests for multiplayer support need to account for the current scope and the compatibility/safety implications of changing it.
+
+  - type: input
+    id: recorder_version
+    attributes:
+      label: Recorder version
+      description: Copy the exact version you tested, or state `N/A - not version-specific`.
+      placeholder: "0.5.0-beta.1 or N/A - not version-specific"
+    validations:
+      required: true
+
+  - type: input
+    id: vtol_version
+    attributes:
+      label: VTOL VR version
+      description: Include the exact game version, or state `N/A - not version-specific`.
+      placeholder: "e.g. 1.11.0"
+    validations:
+      required: true
+
+  - type: input
+    id: mod_loader_version
+    attributes:
+      label: VTOL VR Mod Loader version
+      description: Include the exact Mod Loader version, or state `N/A - not version-specific`.
+      placeholder: "e.g. 2.x.y"
+    validations:
+      required: true
+
+  - type: input
+    id: tacview_version
+    attributes:
+      label: Tacview version
+      description: Include the edition/version, or state `N/A - not version-specific`.
+      placeholder: "e.g. Tacview 1.9.5 Standard"
+    validations:
+      required: true
+
+  - type: input
+    id: mission_map
+    attributes:
+      label: Mission and map
+      description: Name the mission/map where this would help, or state `N/A - general feature`.
+      placeholder: "e.g. Island Campaign / Akutan, or N/A - general feature"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What limitation or user need should this address? Include the practical impact.
+      placeholder: "When I ..., it is difficult/impossible to ... because ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior or workflow you would like to see.
+      placeholder: "I would like the recorder to ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What workarounds, existing tools, or other designs did you consider?
+      placeholder: "I considered ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: supporting_evidence
+    attributes:
+      label: Supporting evidence (optional)
+      description: Attach a redacted screenshot, ACMI excerpt, or short example if it helps explain the request. Never attach terrain RAW/XML caches, keys, credentials, extracted game assets, or other players' data.
+      placeholder: "Drag redacted evidence here, or add links to relevant public documentation/issues."
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy and scope check
+      options:
+        - label: I removed or redacted Windows usernames, full local paths, tokens, keys, credentials, and other private information.
+          required: true
+        - label: I understand that this project currently targets VTOL VR single-player recording only.
+          required: true
+        - label: I searched existing issues and this is not a duplicate.
+          required: true

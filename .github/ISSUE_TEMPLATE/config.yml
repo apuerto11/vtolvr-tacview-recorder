@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Read support and privacy guidance
+    url: https://github.com/kerimala/vtolvr-tacview-recorder/blob/main/SUPPORT.md
+    about: What to include in a report and what must never be uploaded.
+  - name: Read the current beta limitations
+    url: https://github.com/kerimala/vtolvr-tacview-recorder/blob/main/docs/RELEASE_NOTES_0.5.0_COMMUNITY_BETA_DRAFT.md
+    about: Check known limitations before opening an issue.

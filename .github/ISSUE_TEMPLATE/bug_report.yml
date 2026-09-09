@@ -1,0 +1,160 @@
+name: Bug report
+description: Report a reproducible problem in a VTOL VR single-player recording.
+title: "[Bug]: "
+labels:
+  - bug
+  - compatibility
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the recorder. Please search existing issues first and submit one issue per problem.
+
+        This project records **single-player missions only**. Please do not use this form to report missing multiplayer recording support.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Supported scope
+      description: Confirm that the report is within the supported product scope.
+      options:
+        - label: This happened during a VTOL VR single-player mission.
+          required: true
+
+  - type: dropdown
+    id: report_type
+    attributes:
+      label: Report category
+      description: Choose the closest category so the issue can be triaged quickly.
+      options:
+        - Broken behavior
+        - Compatibility or missing support
+        - Installation or documentation
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: recorder_version
+    attributes:
+      label: Recorder version
+      description: Copy the exact version from the package or release notes.
+      placeholder: "0.5.0-beta.1"
+    validations:
+      required: true
+
+  - type: input
+    id: vtol_version
+    attributes:
+      label: VTOL VR version
+      description: Include the exact game version shown by Steam or in the game logs.
+      placeholder: "e.g. 1.11.0"
+    validations:
+      required: true
+
+  - type: input
+    id: mod_loader_version
+    attributes:
+      label: VTOL VR Mod Loader version
+      description: Include the exact Mod Loader version.
+      placeholder: "e.g. 2.x.y"
+    validations:
+      required: true
+
+  - type: input
+    id: tacview_version
+    attributes:
+      label: Tacview version
+      description: Include the edition and exact version if known.
+      placeholder: "e.g. Tacview 1.9.5 Standard"
+    validations:
+      required: true
+
+  - type: input
+    id: mission
+    attributes:
+      label: Mission and map
+      description: Name the mission/campaign and map, for example Island Campaign / Akutan.
+      placeholder: "e.g. Island Campaign / Akutan"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Give the shortest reliable sequence, including the approximate mission time in UTC if the issue is time-dependent.
+      placeholder: |
+        1. Start ...
+        2. Select ...
+        3. At approximately 14:30 UTC mission time, ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected behavior
+      description: What should the recorder or Tacview display/do?
+      placeholder: "I expected ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: Actual behavior
+      description: What happened instead? Include any visible Tacview result or error text.
+      placeholder: "Instead, ..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: player_log
+    attributes:
+      label: Player.log evidence
+      description: Attach a redacted Player.log or paste the relevant excerpt. Redact Windows usernames, full paths, tokens, keys, and any other private data before submitting.
+      placeholder: "Drag a redacted Player.log here, or paste the relevant lines."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acmi_evidence
+    attributes:
+      label: ACMI evidence
+      description: Attach the finalized ACMI or paste a small relevant excerpt with the approximate time/object. Do not attach recordings containing other players' data.
+      placeholder: "Drag a redacted single-player .acmi here, or paste a focused excerpt."
+    validations:
+      required: true
+
+  - type: textarea
+    id: tacview_evidence
+    attributes:
+      label: Tacview screenshot or video
+      description: Attach a screenshot or short clip showing the result. Redact usernames, private paths, chat, and unrelated personal information.
+      placeholder: "Drag a screenshot here, or describe why visual evidence is unavailable."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy and data check
+      description: These checks protect you and other players before an issue becomes public.
+      options:
+        - label: I removed or redacted Windows usernames, full local paths, tokens, keys, credentials, and other private information.
+          required: true
+        - label: I did not attach VTOL VR terrain RAW/XML caches, extracted game assets, or other files that should remain local.
+          required: true
+        - label: The attached recording/evidence contains only my own single-player session and no other players' multiplayer data.
+          required: true
+
+  - type: checkboxes
+    id: self_check
+    attributes:
+      label: Final checks
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+        - label: I can provide more information or a fresh recording if maintainers need it.
+          required: true
