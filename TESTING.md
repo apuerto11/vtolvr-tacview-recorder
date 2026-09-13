@@ -1,5 +1,34 @@
 # Community beta validation
 
+## 0.5.1-beta.1 aircraft-label test
+
+The DLL embeds the six flyable-aircraft definitions and installs them from
+`Main.Awake`. Installer tests cover first install, unchanged-file detection,
+replacement, preservation of unrelated files, failure cleanup, and catalog parity.
+The definitions themselves were verified in Tacview 1.9.5.201 against both
+original EF-24G reporter recordings; the short and long labels are correct.
+
+Local candidate checks before release preparation on 2026-09-13: 201/201 Release tests passed; the net472
+Release build had no warnings or errors. The built DLL's embedded-resource
+installer passed first-install/current/update checks under Windows .NET CLR 4,
+and its installed XML matched the source. Private-package, DLL-only Workshop
+staging, and local Mod Loader DLL hashes matched. These checks preceded publication.
+
+Fresh gameplay and mod-load integration remain community testing targets.
+The maintainer does not own the EF-24G DLC and approved this community beta
+without claiming a fresh EF-24G flight. Testers should:
+
+1. Start VTOL VR with this candidate as the only enabled copy of the recorder.
+2. Check the game log for `Tacview aircraft labels are current` or
+   `Tacview aircraft labels installed/updated` and no new recorder errors.
+3. To exercise first installation, with the game closed move the recorder-owned
+   `Tacview.VTOLVR.PlayerAircraft.xml` out of the Tacview database directory into
+   a backup folder, then load the mod again. Do not move other custom definitions.
+4. Fly and finish an EF-24G single-player mission. Restart Tacview, then open
+   the resulting ACMI: expect EF-24G/Mischief labels and the F-14 model.
+5. Report the mod/Tacview versions, log result, aircraft labels and model;
+   sanitize any shared recordings or logs first.
+
 ## Verified on 2026-09-09
 
 Target Practice, F/A-26B, VTOL VR v1.12.6m1, candidate 0.5.0-private-test.6:
@@ -10,7 +39,7 @@ Timestamps are monotonic. No matching temporary file remained and the
 recorder logged no warnings/errors. Terrain e_coastbay was installed and
 its MapId activated. The tester reported working playback.
 
-The beta changes release metadata only; runtime implementation is unchanged.
+The 0.5.0-beta.1 release changed metadata only relative to that candidate.
 This does not establish every mission, cannon family, or edge case below.
 Akutan, early-exit and multiplayer tests remain open coverage targets.
 

@@ -5,7 +5,7 @@ post-flight review.
 
 ## Status
 
-**0.5.0-beta.1 — community beta.** Records single-player flights for Tacview.
+**0.5.1-beta.1 — community beta.** Records single-player flights for Tacview.
 
 A fresh Target Practice flight on VTOL VR v1.12.6m1 was checked on
 2026-09-09: 20 minutes 27 seconds, 234 objects, 120 sampled gun bullets,
@@ -33,6 +33,12 @@ completed testing. See [TESTING.md](TESTING.md).
 
 The model hints are visual approximations, including the ship proxies. Original
 VTOL VR names remain unchanged. No Tacview or VTOL VR model files are included.
+
+When the mod loads, it automatically installs or updates its bundled
+[aircraft-label definitions](tacview/README.md) for all six flyable aircraft.
+This fixes labels such as **F-4** for an EF-24G with the correct F-14 model.
+Restart Tacview after the first installation or an update; existing recordings
+also receive the corrected labels. No separate XML installation is needed.
 
 ## Requirements
 

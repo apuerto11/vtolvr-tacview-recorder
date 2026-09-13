@@ -3,6 +3,21 @@
 This file records intended community-visible changes. It does not mean that a
 version has been published.
 
+## Community beta — 0.5.1-beta.1 (2026-09-13)
+
+- Embedded aircraft-label definitions in the recorder DLL, with automatic
+  installation/update on mod load for the six flyable aircraft. This corrects
+  EF-24G being labelled F-4 while retaining the existing model proxies.
+- Only the recorder-owned XML in the current user's Tacview database directory
+  is updated. Current files are left untouched; failed installs log a warning
+  and recording continues. Restart Tacview after an installation or update.
+- Existing recordings work without modification. Both GitHub/manual and
+  Workshop distributions carry the definitions inside the same DLL.
+
+- Validation: 201 automated tests; label definitions checked in Tacview 1.9.5.201
+  using two existing EF-24G recordings. Fresh EF-24G gameplay and mod-load
+  integration remain community testing targets.
+
 ## Community beta — 0.5.0-beta.1 (2026-09-09)
 
 ### Added

@@ -11,7 +11,7 @@ the mod if the rights holder objects. No further legal approval is pending.
 The original repository remains private. Public source uses a new repository
 with one reviewed initial commit; the old Git history is not made public.
 
-## Release checks
+## 0.5.0 release checks
 
 - [x] Preserve private Git history and current runtime evidence locally.
 - [x] Validate the 2026-09-09 Target Practice ACMI and recorder log.
@@ -45,3 +45,14 @@ must be investigated before expanding distribution.
 
 Download integrity and Mod Manager discovery are verified. The earlier successful
 flight was from the private test build; no new Workshop runtime test is claimed.
+
+## 0.5.1-beta.1 update — 2026-09-13
+
+The owner authorized committing, pushing and updating GitHub and the existing
+public Workshop item. Fresh EF-24G gameplay is delegated to community testers
+because the maintainer does not own the DLC. No fresh DLC flight is claimed.
+
+- Bundled label definitions were visually checked against two original EF-24G
+  recordings in Tacview 1.9.5.201, with the existing F-14 model retained.
+- Automated validation and distribution checks are recorded with the release.
+- Game mod-load integration and fresh EF-24G gameplay remain open testing targets.

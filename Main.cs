@@ -1,8 +1,10 @@
-﻿global using static VTOLVRTacviewSPRecorder.Main.Logger;
+global using static VTOLVRTacviewSPRecorder.Main.Logger;
 using System.IO;
+using System;
 using System.Reflection;
 using ModLoader.Framework;
 using ModLoader.Framework.Attributes;
+using VTOLVRTacviewSPRecorder.Core;
 
 namespace VTOLVRTacviewSPRecorder.Main;
 
@@ -17,6 +19,20 @@ public class Main : VtolMod
     {
         ModFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         Log($"Awake at {ModFolder}");
+
+        try
+        {
+            TacviewAircraftDatabaseStatus status = TacviewAircraftDatabase.EnsureInstalled(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+            Log(status == TacviewAircraftDatabaseStatus.Current
+                ? "Tacview aircraft labels are current."
+                : $"Tacview aircraft labels {status.ToString().ToLowerInvariant()}. Restart Tacview to load them.");
+        }
+        catch (Exception exception)
+        {
+            // A viewer configuration failure must not prevent flight recording.
+            LogWarn($"Could not install Tacview aircraft labels; recording will continue: {exception.Message}");
+        }
 
         _recorderLifecycle = new RecorderLifecycle(this);
         _recorderLifecycle.StartListening();

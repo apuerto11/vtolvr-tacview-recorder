@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DefaultPropertiesCollection Version="1.0" LoadingOrder="0.5">
+  <!-- Original VTOL VR labels; shapes are visual proxies only.
+       Generic bases avoid inheriting real-aircraft names and performance data. -->
+  <DefaultProperties Id="VTOLVR.FixedWing.EF-24G" Base="Core.FixedWing">
+    <Criteria>
+      <Type>FixedWing</Type>
+      <Name>EF-24G</Name>
+      <Name>EF-24G Mischief</Name>
+    </Criteria>
+    <Properties>
+      <ShortName>EF-24G</ShortName>
+      <LongName>EF-24G Mischief</LongName>
+      <FullName>EF-24G Mischief</FullName>
+      <Shape>FixedWing.F-14.obj</Shape>
+    </Properties>
+  </DefaultProperties>
+  <DefaultProperties Id="VTOLVR.FixedWing.FA-26B" Base="Core.FixedWing">
+    <Criteria>
+      <Type>FixedWing</Type>
+      <Name>F/A-26B</Name>
+      <Name>F/A-26B Wasp</Name>
+      <Name>FA-26B</Name>
+    </Criteria>
+    <Properties>
+      <ShortName>F/A-26B</ShortName>
+      <LongName>F/A-26B Wasp</LongName>
+      <FullName>F/A-26B Wasp</FullName>
+      <Shape>FixedWing.F-18E.obj</Shape>
+    </Properties>
+  </DefaultProperties>
+  <DefaultProperties Id="VTOLVR.FixedWing.F-45A" Base="Core.FixedWing">
+    <Criteria>
+      <Type>FixedWing</Type>
+      <Name>F-45A</Name>
+      <Name>F-45A Ghost</Name>
+    </Criteria>
+    <Properties>
+      <ShortName>F-45A</ShortName>
+      <LongName>F-45A Ghost</LongName>
+      <FullName>F-45A Ghost</FullName>
+      <Shape>FixedWing.F-35.obj</Shape>
+    </Properties>
+  </DefaultProperties>
+  <DefaultProperties Id="VTOLVR.FixedWing.T-55" Base="Core.FixedWing">
+    <Criteria>
+      <Type>FixedWing</Type>
+      <Name>T-55</Name>
+      <Name>T-55 Tyro</Name>
+    </Criteria>
+    <Properties>
+      <ShortName>T-55</ShortName>
+      <LongName>T-55 Tyro</LongName>
+      <FullName>T-55 Tyro</FullName>
+      <Shape>FixedWing.T-38.obj</Shape>
+    </Properties>
+  </DefaultProperties>
+  <DefaultProperties Id="VTOLVR.FixedWing.AV-42C" Base="Core.FixedWing">
+    <Criteria>
+      <Type>FixedWing</Type>
+      <Name>AV-42C</Name>
+      <Name>AV-42C Kestrel</Name>
+    </Criteria>
+    <Properties>
+      <ShortName>AV-42C</ShortName>
+      <LongName>AV-42C Kestrel</LongName>
+      <FullName>AV-42C Kestrel</FullName>
+      <Shape>FixedWing.AV-8B.obj</Shape>
+    </Properties>
+  </DefaultProperties>
+  <DefaultProperties Id="VTOLVR.Rotorcraft.AH-94" Base="Core.Rotorcraft">
+    <Criteria>
+      <Type>Rotorcraft</Type>
+      <Name>AH-94</Name>
+      <Name>AH-94 Dragonfly</Name>
+    </Criteria>
+    <Properties>
+      <ShortName>AH-94</ShortName>
+      <LongName>AH-94 Dragonfly</LongName>
+      <FullName>AH-94 Dragonfly</FullName>
+      <Shape>Rotorcraft.AH-64.obj</Shape>
+    </Properties>
+  </DefaultProperties>
+</DefaultPropertiesCollection>

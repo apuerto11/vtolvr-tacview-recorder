@@ -463,7 +463,7 @@ public sealed class TacviewCoreTests
     }
 
     [Fact]
-    public void LocalManifestIdentifiesV050CommunityBetaAndRequiredDependency()
+    public void LocalManifestIdentifiesV051CommunityBetaAndRequiredDependency()
     {
         string repositoryRoot = Path.GetFullPath(Path.Combine(
             AppContext.BaseDirectory,
@@ -474,7 +474,7 @@ public sealed class TacviewCoreTests
         JsonElement root = manifest.RootElement;
 
         Assert.Equal(
-            "Tacview Singleplayer Recorder [0.5.0-beta.1]",
+            "Tacview Singleplayer Recorder [0.5.1-beta.1]",
             root.GetProperty("Title").GetString());
         Assert.Contains("terrain", root.GetProperty("Description").GetString(), StringComparison.OrdinalIgnoreCase);
         Assert.Contains("Community beta", root.GetProperty("Description").GetString());

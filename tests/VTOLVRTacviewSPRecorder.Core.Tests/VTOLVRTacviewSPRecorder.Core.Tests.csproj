@@ -16,5 +16,6 @@
   <ItemGroup>
     <Compile Include="..\..\Core\*.cs" Link="Core\%(Filename)%(Extension)" />
     <Compile Include="..\*.cs" Link="%(Filename)%(Extension)" />
+    <EmbeddedResource Include="..\..\tacview\Tacview.VTOLVR.PlayerAircraft.xml" LogicalName="VTOLVRTacviewSPRecorder.Tacview.PlayerAircraft.xml" />
   </ItemGroup>
 </Project>

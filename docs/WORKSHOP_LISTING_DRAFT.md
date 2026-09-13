@@ -25,7 +25,7 @@ in-game smoke test remains an open beta validation target.
 ## Workshop description
 
 ```text
-[h1]Tacview Singleplayer Recorder — 0.5.0-beta.1 Community Beta[/h1]
+[h1]Tacview Singleplayer Recorder — 0.5.1-beta.1 Community Beta[/h1]
 
 Records supported VTOL VR single-player missions as Tacview ACMI 2.2 files for post-flight review.
 
@@ -35,6 +35,7 @@ Records supported VTOL VR single-player missions as Tacview ACMI 2.2 files for p
 [*]Local Tacview terrain companion with matching MapId switching
 [*]Experimental Akutan Campaign terrain path; broader live validation is still requested
 [*]Reviewed aircraft and stock Carrier/Escort Cruiser visual proxy shapes
+[*]Automatic Tacview labels for all six flyable aircraft, including the EF-24G/F-4 label fix
 [*]Live `Projectile+Bullet` samples from real VTOL VR Bullet instances for observed cannon fire
 [/list]
 
@@ -50,6 +51,8 @@ Records supported VTOL VR single-player missions as Tacview ACMI 2.2 files for p
 [*]Single-player only. Multiplayer sessions are intentionally not recorded.
 [*]Terrain is a locally generated heightfield, not VTOL VR textures or game assets.
 [*]Aircraft and ship shapes are visual proxies.
+[*]After updating, load the mod once and restart Tacview to activate aircraft labels. Existing recordings also benefit.
+[*]0.5.1: label definitions checked using two EF-24G recordings; fresh EF-24G gameplay and mod-load integration await community testing.
 [*]Gun bullets follow the real pooled Bullet transform until its lifecycle teardown; they are not an exact round count, hit log, or ballistic replay.
 [*]After a newly generated terrain cache, restart Tacview before opening the finalized ACMI and keep Auto Terrain Switch enabled.
 [/list]
