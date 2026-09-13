@@ -29,6 +29,10 @@ without claiming a fresh EF-24G flight. Testers should:
 5. Report the mod/Tacview versions, log result, aircraft labels and model;
    sanitize any shared recordings or logs first.
 
+Release checks on 2026-09-13: 201/201 tests passed in both Debug and Release,
+with 0 warnings/errors in both builds. GitHub ZIP and subscribed Workshop DLL
+were downloaded and verified against the release build; see RELEASE_CHECKLIST.md.
+
 ## Verified on 2026-09-09
 
 Target Practice, F/A-26B, VTOL VR v1.12.6m1, candidate 0.5.0-private-test.6:

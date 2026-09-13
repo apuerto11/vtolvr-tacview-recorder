@@ -56,3 +56,21 @@ because the maintainer does not own the DLC. No fresh DLC flight is claimed.
   recordings in Tacview 1.9.5.201, with the existing F-14 model retained.
 - Automated validation and distribution checks are recorded with the release.
 - Game mod-load integration and fresh EF-24G gameplay remain open testing targets.
+
+### Verified distribution
+
+- Public source/tag: `6c7561d212706d4c976222eaf0c0f0606dd3fbd7`, `v0.5.1-beta.1`.
+- [GitHub prerelease](https://github.com/kerimala/vtolvr-tacview-recorder/releases/tag/v0.5.1-beta.1)
+  is published. Downloaded ZIP entries and DLL bytes match the local package.
+- Existing [Workshop item](https://steamcommunity.com/sharedfiles/filedetails/?id=3798566504)
+  updated successfully; public description and change note show 0.5.1-beta.1.
+  Public visibility, Client Side tag, preview image and VTOLAPI requirement retained.
+- Steam downloaded the update; the subscribed Workshop DLL matches the GitHub DLL.
+- DLL SHA-256: `3d9dd693d690a0293605ef475b654502d742640c469931def2c42837ca8a6f66`.
+- ZIP SHA-256: `b4847aa6fc7477370461dfa57ad1bc9da9868f7a9648b6e8b0dce143b46d1073`.
+- 201/201 tests passed in Debug and Release; both builds had 0 warnings/errors.
+- Release DLL installer passed Installed/Current/Updated checks on Windows CLR 4;
+  installed definitions matched the source resource.
+- Gitleaks scans of the complete public history, source and downloaded package
+  found no indications of secrets. This is not an absolute guarantee.
+- No new game session was run; fresh gameplay and game mod-load validation remain open.

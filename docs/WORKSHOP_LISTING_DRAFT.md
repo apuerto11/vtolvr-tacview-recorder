@@ -5,6 +5,9 @@ The owner-provided Tacview screenshot is uploaded and VTOLAPI is a required item
 Workshop download hash and Mod Manager discovery were verified; a fresh Workshop
 in-game smoke test remains an open beta validation target.
 
+Updated to **0.5.1-beta.1** on 2026-09-13. Public description/change note and
+subscribed Workshop DLL hash verified against the GitHub release.
+
 ## Uploader fields
 
 | Field | Published value / decision |
