@@ -1,5 +1,32 @@
 # Community beta validation
 
+## Real-Time Telemetry (fork)
+
+Validated in game by the fork owner: Release build against the game and Mod
+Loader assemblies (`-p:ModLoaderPath=...\VTOL VR\@Mod Loader`), host listening
+on load, tacv-acmi-bridge connected live with the player detected, `.acmi` file
+written as before. The checklist below remains the regression procedure.
+
+
+Automated: 220/220 Core tests on .NET 8, Core compiled for net472, and a live
+interoperability run between `TacviewRealtimeServer` and tacv-acmi-bridge
+(snapshot on late join, live frames, destruction events). The Unity wiring
+(`Main`, `RecorderLifecycle`, `RecorderSession`) could not be compiled outside
+Windows: build the mod normally first (when the Mod Loader is not in the default
+Steam folder, pass `-p:ModLoaderPath=<folder containing Managed\>`). Then:
+
+1. Load the mod; the log should show `Tacview real-time telemetry listening on
+   127.0.0.1:42674` and `realtime.cfg` should appear next to the DLL.
+2. Start a single-player mission. In Tacview: Record → Real-Time Telemetry →
+   `127.0.0.1`, port 42674, empty password. Units should move live.
+3. Or run tacv-acmi-bridge: `npm start -- --acmi 127.0.0.1:42674`, then open a
+   TACV front on `?source=ws&url=ws://localhost:8787/ws`.
+4. Disconnect and reconnect the client mid-mission: it should get the current
+   state immediately. Leave the mission: the `.acmi` file must be complete and
+   identical in content to what was streamed.
+5. Set `enabled=false`: no listener, recording unchanged. Set a wrong
+   `password` on the client: connection refused, recording unchanged.
+
 ## 0.5.1-beta.1 aircraft-label test
 
 The DLL embeds the six flyable-aircraft definitions and installs them from

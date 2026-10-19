@@ -14,6 +14,7 @@ public class Main : VtolMod
     public string ModFolder;
 
     private RecorderLifecycle _recorderLifecycle;
+    private TacviewRealtimeServer _realtimeServer;
 
     private void Awake()
     {
@@ -34,7 +35,8 @@ public class Main : VtolMod
             LogWarn($"Could not install Tacview aircraft labels; recording will continue: {exception.Message}");
         }
 
-        _recorderLifecycle = new RecorderLifecycle(this);
+        _realtimeServer = StartRealtimeServer();
+        _recorderLifecycle = new RecorderLifecycle(this, _realtimeServer);
         _recorderLifecycle.StartListening();
     }
 
@@ -42,5 +44,38 @@ public class Main : VtolMod
     {
         _recorderLifecycle?.Dispose();
         _recorderLifecycle = null;
+        _realtimeServer?.Dispose();
+        _realtimeServer = null;
+    }
+
+    private TacviewRealtimeServer StartRealtimeServer()
+    {
+        // Optional live view (Tacview Real-Time Telemetry). Any failure here
+        // leaves file recording untouched.
+        try
+        {
+            var warnings = new System.Collections.Generic.List<string>();
+            string path = Path.Combine(ModFolder, TacviewRealtimeSettings.FileName);
+            TacviewRealtimeSettings settings = TacviewRealtimeSettings.LoadOrCreate(path, warnings);
+            foreach (string warning in warnings)
+            {
+                LogWarn($"{TacviewRealtimeSettings.FileName}: {warning}");
+            }
+
+            if (!settings.Enabled)
+            {
+                Log("Tacview real-time telemetry is disabled.");
+                return null;
+            }
+
+            var server = new TacviewRealtimeServer(settings, message => Log(message));
+            server.Start();
+            return server;
+        }
+        catch (Exception exception)
+        {
+            LogWarn($"Tacview real-time telemetry is unavailable; recording will continue: {exception.Message}");
+            return null;
+        }
     }
 }

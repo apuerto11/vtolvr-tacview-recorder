@@ -185,6 +185,31 @@ public sealed class TacviewEntityWriter : IDisposable
             new UnconfirmedMapIdSuppressor());
     }
 
+    /// <summary>
+    /// Records to file and also hands every flushed frame (header included) to
+    /// <paramref name="realtimeSink"/>, e.g. <see cref="TacviewRealtimeServer.Publish"/>.
+    /// A sink failure is reported once through <paramref name="onRealtimeError"/>
+    /// and never interrupts the file recording.
+    /// </summary>
+    public static TacviewEntityWriter CreateFile(
+        string outputDirectory,
+        string missionName,
+        DateTimeOffset referenceTimeUtc,
+        TacviewRecordingMetadata recordingMetadata,
+        Action<string> realtimeSink,
+        Action<Exception> onRealtimeError)
+    {
+        return CreateFile(
+            outputDirectory,
+            missionName,
+            referenceTimeUtc,
+            recordingMetadata,
+            new AtomicFileMover(),
+            new UnconfirmedMapIdSuppressor(),
+            realtimeSink,
+            onRealtimeError);
+    }
+
     internal static TacviewEntityWriter CreateFile(
         string outputDirectory,
         string missionName,
@@ -207,7 +232,9 @@ public sealed class TacviewEntityWriter : IDisposable
         DateTimeOffset referenceTimeUtc,
         TacviewRecordingMetadata recordingMetadata,
         IAtomicFileMover fileMover,
-        IUnconfirmedMapIdSuppressor mapIdSuppressor)
+        IUnconfirmedMapIdSuppressor mapIdSuppressor,
+        Action<string> realtimeSink = null,
+        Action<Exception> onRealtimeError = null)
     {
         if (string.IsNullOrWhiteSpace(outputDirectory))
         {
@@ -222,7 +249,7 @@ public sealed class TacviewEntityWriter : IDisposable
         string temporaryPath = finalPath + ".tmp";
 
         FileStream stream = null;
-        StreamWriter writer = null;
+        TextWriter writer = null;
 
         try
         {
@@ -238,6 +265,10 @@ public sealed class TacviewEntityWriter : IDisposable
                 AutoFlush = false
             };
             stream = null;
+            if (realtimeSink != null)
+            {
+                writer = new TeeTextWriter(writer, realtimeSink, onRealtimeError);
+            }
 
             return new TacviewEntityWriter(
                 writer,
