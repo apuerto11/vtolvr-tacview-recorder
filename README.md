@@ -164,6 +164,35 @@ own colors/textures unless the user separately configures a lawful texture.
 See [LEGAL_AND_PRIVACY.md](LEGAL_AND_PRIVACY.md) for the independent-project,
 license, EULA, asset, and privacy boundaries.
 
+## Live view (Tacview Real-Time Telemetry)
+
+While a mission is recorded, the mod also acts as a Tacview **Real-Time
+Telemetry** host: Tacview (Record → Real-Time Telemetry), or a bridge such as
+[tacv-acmi-bridge](https://github.com/apuerto11/tacv-acmi-bridge), can follow
+every unit live. The `.acmi` file is written exactly as before; the live stream
+carries the same frames.
+
+- Default: listening on `127.0.0.1:42674`, no password, so only programs on
+  this PC can connect.
+- A client that connects mid-mission first receives a complete snapshot of
+  the current state (header, mission properties and every live object), then
+  each frame as it is recorded. Past events are not replayed.
+- A client that falls more than ~50 seconds behind is disconnected; recording
+  is never slowed down or interrupted by the network.
+
+Settings live in `realtime.cfg`, created next to the mod DLL on first load:
+
+```text
+enabled=true
+bind=127.0.0.1      # 0.0.0.0 to accept other machines (open the port in the firewall)
+port=42674
+password=           # empty = no password
+max_clients=4
+```
+
+Restart the game after editing the file. Invalid lines are reported in the
+game log and ignored.
+
 ## Build from source
 
 The project uses the default Steam installation paths. If VTOL VR or the Mod
@@ -200,7 +229,8 @@ upload.
 
 ## Current limitations
 
-- Multiplayer recording is not supported.
+- Multiplayer recording is not supported, so neither is the live view in
+  multiplayer.
 - Aircraft, ground, and ship models are visual proxies, not exact replicas.
 - Terrain is a heightfield: no buildings, bridges, caves, overhangs, scenery
   meshes, or VTOL VR surface textures are exported.

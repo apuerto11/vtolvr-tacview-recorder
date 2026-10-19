@@ -24,6 +24,11 @@ Do not redistribute those derived caches or extracted game assets.
 ## Privacy
 
 The recorder has no automatic telemetry, crash-reporting, or upload channel.
+Its optional Real-Time Telemetry host only answers connections that you open:
+by default it listens on 127.0.0.1 (this PC only) and sends nothing anywhere.
+If you set `bind=0.0.0.0` in `realtime.cfg`, anyone who can reach that port
+can watch the live mission, including the pilot name; set a password and
+restrict the port in your firewall. Disable it with `enabled=false`.
 Recordings can contain pilot names, mission information and local paths.
 Before manually sharing a bug report, follow [SUPPORT.md](SUPPORT.md) and
 redact private information. Never attach terrain RAW/XML files or credentials.

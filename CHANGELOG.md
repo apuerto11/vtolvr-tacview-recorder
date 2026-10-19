@@ -3,6 +3,20 @@
 This file records intended community-visible changes. It does not mean that a
 version has been published.
 
+## Unreleased — Real-Time Telemetry (fork)
+
+- Tacview Real-Time Telemetry host: Tacview or a bridge can follow the mission
+  live while the `.acmi` file is recorded as before. Handshake and password
+  hash (CRC-64, legacy CRC-32 accepted) follow the Tacview protocol.
+- Late clients receive a complete snapshot of the current mission state, then
+  incremental frames. Slow clients are disconnected instead of slowing the
+  game; a network failure never interrupts the file recording.
+- `realtime.cfg` next to the DLL: `enabled`, `bind` (127.0.0.1 by default),
+  `port` (42674), `password`, `max_clients`.
+- Validation: 220 automated tests (19 new: hashes, settings, snapshot mirror,
+  file/stream parity, TCP handshake and refusal); Core builds for net472.
+  Interoperability checked with tacv-acmi-bridge. In-game validation pending.
+
 ## Community beta — 0.5.1-beta.1 (2026-09-13)
 
 - Embedded aircraft-label definitions in the recorder DLL, with automatic

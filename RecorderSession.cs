@@ -15,6 +15,7 @@ internal sealed class RecorderSession : IDisposable
     private readonly MonoBehaviour _coroutineHost;
     private readonly VTMapManager _mapManager;
     private readonly VTScenario _scenario;
+    private readonly TacviewRealtimeServer _realtimeServer;
     private readonly List<EntitySamplingTarget> _samplingTargets =
         new List<EntitySamplingTarget>(128);
     private readonly List<Actor> _activeActors = new List<Actor>(64);
@@ -44,9 +45,11 @@ internal sealed class RecorderSession : IDisposable
         VTScenes scene,
         object scenarioToken,
         string missionName,
-        VTMapManager mapManager)
+        VTMapManager mapManager,
+        TacviewRealtimeServer realtimeServer = null)
     {
         _coroutineHost = coroutineHost ?? throw new ArgumentNullException(nameof(coroutineHost));
+        _realtimeServer = realtimeServer;
         Scene = scene;
         ScenarioToken = scenarioToken ?? throw new ArgumentNullException(nameof(scenarioToken));
         MissionName = missionName ?? throw new ArgumentNullException(nameof(missionName));
@@ -145,11 +148,20 @@ internal sealed class RecorderSession : IDisposable
             _missionContextAdapter.RegisterStaticContext();
             TacviewRecordingMetadata recordingMetadata =
                 _missionContextAdapter.BuildRecordingMetadata(_terrainMapId);
-            _writer = TacviewEntityWriter.CreateFile(
-                outputDirectory,
-                MissionName,
-                startUtc,
-                recordingMetadata);
+            _writer = _realtimeServer == null
+                ? TacviewEntityWriter.CreateFile(
+                    outputDirectory,
+                    MissionName,
+                    startUtc,
+                    recordingMetadata)
+                : TacviewEntityWriter.CreateFile(
+                    outputDirectory,
+                    MissionName,
+                    startUtc,
+                    recordingMetadata,
+                    _realtimeServer.Publish,
+                    exception => LogWarn(
+                        $"Tacview real-time telemetry stopped for this mission; recording continues: {exception.Message}"));
             OutputPath = _writer.FinalPath;
             _isActive = true;
 

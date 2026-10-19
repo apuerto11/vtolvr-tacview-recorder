@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using VTOLAPI;
 using VTOLVR.Multiplayer;
+using VTOLVRTacviewSPRecorder.Core;
 
 namespace VTOLVRTacviewSPRecorder.Main;
 
@@ -18,14 +19,16 @@ internal sealed class RecorderLifecycle : IDisposable
     private const int TerrainDiscoveryMaxAttempts = 20;
 
     private readonly MonoBehaviour _coroutineHost;
+    private readonly TacviewRealtimeServer _realtimeServer;
     private RecorderSession _activeSession;
     private IEnumerator _missionWaitRoutine;
     private bool _eventsSubscribed;
     private bool _disposed;
 
-    public RecorderLifecycle(MonoBehaviour coroutineHost)
+    public RecorderLifecycle(MonoBehaviour coroutineHost, TacviewRealtimeServer realtimeServer = null)
     {
         _coroutineHost = coroutineHost ?? throw new ArgumentNullException(nameof(coroutineHost));
+        _realtimeServer = realtimeServer;
     }
 
     public void StartListening()
@@ -206,7 +209,7 @@ internal sealed class RecorderLifecycle : IDisposable
         }
 
         string missionName = GetMissionName(scenario);
-        var session = new RecorderSession(_coroutineHost, scene, scenario, missionName, mapManager);
+        var session = new RecorderSession(_coroutineHost, scene, scenario, missionName, mapManager, _realtimeServer);
 
         bool started;
         try
@@ -243,7 +246,19 @@ internal sealed class RecorderLifecycle : IDisposable
 
         RecorderSession session = _activeSession;
         _activeSession = null;
+        try
+        {
+            StopActiveSession(session, reason);
+        }
+        finally
+        {
+            // Late real-time clients must not receive the finished mission's state.
+            _realtimeServer?.EndSession();
+        }
+    }
 
+    private static void StopActiveSession(RecorderSession session, string reason)
+    {
         if (!session.TryStop())
         {
             Log($"Recorder session stop ignored: '{session.MissionName}' is already stopped ({reason}).");
