@@ -15,7 +15,9 @@ version has been published.
   `port` (42674), `password`, `max_clients`.
 - Validation: 220 automated tests (19 new: hashes, settings, snapshot mirror,
   file/stream parity, TCP handshake and refusal); Core builds for net472.
-  Interoperability checked with tacv-acmi-bridge. In-game validation pending.
+  Interoperability checked with tacv-acmi-bridge. Validated in game by the
+  fork owner: the mod builds against the game and Mod Loader assemblies, the
+  host listens on load, and tacv-acmi-bridge follows the mission live.
 
 ## Community beta — 0.5.1-beta.1 (2026-09-13)
 

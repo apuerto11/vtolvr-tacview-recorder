@@ -1,12 +1,19 @@
 # Community beta validation
 
-## Real-Time Telemetry (fork, not yet validated in game)
+## Real-Time Telemetry (fork)
+
+Validated in game by the fork owner: Release build against the game and Mod
+Loader assemblies (`-p:ModLoaderPath=...\VTOL VR\@Mod Loader`), host listening
+on load, tacv-acmi-bridge connected live with the player detected, `.acmi` file
+written as before. The checklist below remains the regression procedure.
+
 
 Automated: 220/220 Core tests on .NET 8, Core compiled for net472, and a live
 interoperability run between `TacviewRealtimeServer` and tacv-acmi-bridge
 (snapshot on late join, live frames, destruction events). The Unity wiring
 (`Main`, `RecorderLifecycle`, `RecorderSession`) could not be compiled outside
-Windows: build the mod normally first. Then:
+Windows: build the mod normally first (when the Mod Loader is not in the default
+Steam folder, pass `-p:ModLoaderPath=<folder containing Managed\>`). Then:
 
 1. Load the mod; the log should show `Tacview real-time telemetry listening on
    127.0.0.1:42674` and `realtime.cfg` should appear next to the DLL.
