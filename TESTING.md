@@ -27,6 +27,27 @@ Steam folder, pass `-p:ModLoaderPath=<folder containing Managed\>`). Then:
 5. Set `enabled=false`: no listener, recording unchanged. Set a wrong
    `password` on the client: connection refused, recording unchanged.
 
+## Flight data (fork, untested in game)
+
+Automated: 235/235 Core tests on .NET 8, Core compiled for net472, and
+`VtolFlightDataAdapter` type-checked against stubs of the Unity/VTOL VR
+members it uses. `RecorderSession`, `RecorderLifecycle`, `Main` and the
+missile-retarget change in `VtolWeaponRegistryAdapter` were not compiled here.
+In game:
+
+1. Build the mod; load a mission. The log should show `Flight data export:`
+   with the game types found (FlightInfo, FuelTank, ModuleEngine,
+   LockingRadar, Radar, launchers). Report any `false`/`0`.
+2. Fly; in Tacview (file or live) select your aircraft: IAS/TAS/Mach/AOA/AGL,
+   Throttle and FuelVolume should be plausible and update about twice a second.
+3. Lock a target with the radar: `LockedTarget` should point at it; release:
+   `LockedTargetMode=0`. Fire a radar missile: its `LockedTarget` should follow
+   the target, also after a target switch.
+4. Near a SAM site: check `RadarRange`/`EngagementRange` values, and that
+   SAM radar locks on you appear.
+5. Set the four `export_*`/`flight_data_rate_hz` keys off/other values and
+   check the file no longer carries (or rate-limits) these properties.
+
 ## 0.5.1-beta.1 aircraft-label test
 
 The DLL embeds the six flyable-aircraft definitions and installs them from

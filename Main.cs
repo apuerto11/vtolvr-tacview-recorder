@@ -35,8 +35,9 @@ public class Main : VtolMod
             LogWarn($"Could not install Tacview aircraft labels; recording will continue: {exception.Message}");
         }
 
-        _realtimeServer = StartRealtimeServer();
-        _recorderLifecycle = new RecorderLifecycle(this, _realtimeServer);
+        TacviewRealtimeSettings settings = LoadSettings();
+        _realtimeServer = StartRealtimeServer(settings);
+        _recorderLifecycle = new RecorderLifecycle(this, _realtimeServer, settings);
         _recorderLifecycle.StartListening();
     }
 
@@ -48,10 +49,10 @@ public class Main : VtolMod
         _realtimeServer = null;
     }
 
-    private TacviewRealtimeServer StartRealtimeServer()
+    private TacviewRealtimeSettings LoadSettings()
     {
-        // Optional live view (Tacview Real-Time Telemetry). Any failure here
-        // leaves file recording untouched.
+        // realtime.cfg also holds the flight-data export switches, which apply
+        // to file recording; a read failure falls back to the defaults.
         try
         {
             var warnings = new System.Collections.Generic.List<string>();
@@ -62,6 +63,21 @@ public class Main : VtolMod
                 LogWarn($"{TacviewRealtimeSettings.FileName}: {warning}");
             }
 
+            return settings;
+        }
+        catch (Exception exception)
+        {
+            LogWarn($"Could not read {TacviewRealtimeSettings.FileName}; using defaults: {exception.Message}");
+            return new TacviewRealtimeSettings();
+        }
+    }
+
+    private TacviewRealtimeServer StartRealtimeServer(TacviewRealtimeSettings settings)
+    {
+        // Optional live view (Tacview Real-Time Telemetry). Any failure here
+        // leaves file recording untouched.
+        try
+        {
             if (!settings.Enabled)
             {
                 Log("Tacview real-time telemetry is disabled.");

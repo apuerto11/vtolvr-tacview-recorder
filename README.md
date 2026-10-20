@@ -30,6 +30,8 @@ completed testing. See [TESTING.md](TESTING.md).
   the reviewed Carrier/Escort Cruiser sea families
 - A local Tacview 1.9.5 custom elevation map generated from VTOL VR's active
   gameplay height data
+- Flight data, radar locks and sensor ranges as Tacview object properties
+  (fork, untested in game; see [Flight data](#flight-data-fork-untested-in-game))
 
 The model hints are visual approximations, including the ship proxies. Original
 VTOL VR names remain unchanged. No Tacview or VTOL VR model files are included.
@@ -192,6 +194,42 @@ max_clients=4
 
 Restart the game after editing the file. Invalid lines are reported in the
 game log and ignored.
+
+## Flight data (fork, untested in game)
+
+The recorder can add Tacview ACMI 2.2 object properties, in the `.acmi` file
+and the live stream alike. **This has not yet been run in game**: it is
+covered by unit tests only, and the VTOL VR members marked *unverified* below
+are looked up by name at run time, so a missing member only disables that
+property (logged once at mission start: `Flight data export: ... types found`).
+
+| Property | Objects | Source |
+| --- | --- | --- |
+| `TAS` (m/s) | aircraft | Rigidbody velocity (no wind model: ground-relative speed) |
+| `Mach`, `IAS` (m/s) | aircraft | estimated from TAS and altitude with the standard atmosphere (IAS = equivalent airspeed) |
+| `AOA`, `AOS` (°) | aircraft | velocity in the aircraft frame (above 5 m/s) |
+| `AGL` (m) | aircraft | `FlightInfo.radarAltitude` — unverified |
+| `FuelVolume` | aircraft | sum of `FuelTank.fuel` — unverified, unit assumed liters |
+| `Throttle` | aircraft | mean `ModuleEngine.finalThrottle` — unverified |
+| `LockedTarget`, `LockedTargetMode` | aircraft, ground units, ships | `LockingRadar.IsLocked()` / `currentLock.actor` — unverified; mode 0 when the lock is released |
+| `LockedTarget` | missiles | guidance target (radar lock, optical or anti-radiation target, as at launch), now refreshed during flight |
+| `RadarMode`, `RadarRange` (m) | ground units, ships | `Radar.radarEnabled` / `radarRange` — unverified |
+| `EngagementRange`, `VerticalEngagementRange` (m) | ground units, ships | `SAMLauncher`/`IRSamLauncher` range members — unverified, guessed names |
+
+Properties are sampled at `flight_data_rate_hz` (2 Hz by default) and written
+only when they change beyond a small threshold (for example 1 m/s, 0.005 Mach,
+0.5° AOA), which keeps the file size moderate. A missile that loses its target
+keeps the last `LockedTarget`. Settings, in `realtime.cfg`:
+
+```text
+export_flight_data=true   # IAS, TAS, Mach, AOA, AOS, AGL, Throttle, FuelVolume
+export_engagement=true    # radar locks, missile target updates
+export_sensors=true       # RadarMode, RadarRange, EngagementRange, VerticalEngagementRange
+flight_data_rate_hz=2     # 0.1 to 10
+```
+
+`ExportFlightData=true` style spellings are accepted too. An existing
+`realtime.cfg` without these lines uses the defaults above (all enabled).
 
 ## Build from source
 

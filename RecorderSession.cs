@@ -16,6 +16,11 @@ internal sealed class RecorderSession : IDisposable
     private readonly VTMapManager _mapManager;
     private readonly VTScenario _scenario;
     private readonly TacviewRealtimeServer _realtimeServer;
+    private readonly TacviewRealtimeSettings _settings;
+    private readonly List<Actor> _telemetryActors = new List<Actor>(64);
+    private readonly List<KeyValuePair<ulong, TacviewTelemetry>> _frameTelemetry =
+        new List<KeyValuePair<ulong, TacviewTelemetry>>(64);
+    private VtolFlightDataAdapter _flightDataAdapter;
     private readonly List<EntitySamplingTarget> _samplingTargets =
         new List<EntitySamplingTarget>(128);
     private readonly List<Actor> _activeActors = new List<Actor>(64);
@@ -46,10 +51,12 @@ internal sealed class RecorderSession : IDisposable
         object scenarioToken,
         string missionName,
         VTMapManager mapManager,
-        TacviewRealtimeServer realtimeServer = null)
+        TacviewRealtimeServer realtimeServer = null,
+        TacviewRealtimeSettings settings = null)
     {
         _coroutineHost = coroutineHost ?? throw new ArgumentNullException(nameof(coroutineHost));
         _realtimeServer = realtimeServer;
+        _settings = settings ?? new TacviewRealtimeSettings();
         Scene = scene;
         ScenarioToken = scenarioToken ?? throw new ArgumentNullException(nameof(scenarioToken));
         MissionName = missionName ?? throw new ArgumentNullException(nameof(missionName));
@@ -123,6 +130,22 @@ internal sealed class RecorderSession : IDisposable
             {
                 _countermeasureAdapter = null;
                 LogWarn($"Countermeasure capture is unavailable for this session: {ex}");
+            }
+            try
+            {
+                var flightData = new VtolFlightDataAdapter(
+                    _mapManager,
+                    _entityRegistry,
+                    _settings.ExportFlightData,
+                    _settings.ExportEngagement,
+                    _settings.ExportSensors,
+                    _settings.FlightDataRateHz);
+                _flightDataAdapter = flightData.IsEnabled ? flightData : null;
+            }
+            catch (Exception ex)
+            {
+                _flightDataAdapter = null;
+                LogWarn($"Flight data export is unavailable for this session: {ex.Message}");
             }
             _missionContextAdapter = new VtolMissionContextAdapter(
                 _mapManager,
@@ -313,6 +336,8 @@ internal sealed class RecorderSession : IDisposable
                     update.Entity.Metadata));
             }
 
+            CollectTelemetry(now);
+
             if (_frameUpdates.Count > 0 || _frameEvents.Count > 0)
             {
                 try
@@ -333,6 +358,37 @@ internal sealed class RecorderSession : IDisposable
         }
 
         _samplingRoutine = null;
+    }
+
+    private void CollectTelemetry(double now)
+    {
+        if (_flightDataAdapter == null || !_flightDataAdapter.TryBeginPass(now))
+        {
+            return;
+        }
+
+        try
+        {
+            if (_settings.ExportEngagement)
+            {
+                _weaponAdapter?.RefreshMissileTargets();
+            }
+
+            _telemetryActors.Clear();
+            _frameTelemetry.Clear();
+            _entityAdapter.CopyActiveActorsTo(_telemetryActors);
+            _flightDataAdapter.Collect(_telemetryActors, _frameTelemetry);
+            TacviewTelemetryMerger.Merge(_frameUpdates, _frameTelemetry);
+        }
+        catch (Exception ex)
+        {
+            LogRefreshWarning(now, $"Flight data collection failed: {ex.Message}");
+        }
+        finally
+        {
+            _telemetryActors.Clear();
+            _frameTelemetry.Clear();
+        }
     }
 
     private void ForgetRemovedEntities()
@@ -469,6 +525,10 @@ internal sealed class RecorderSession : IDisposable
             }
         }
 
+        _flightDataAdapter?.Clear();
+        _flightDataAdapter = null;
+        _telemetryActors.Clear();
+        _frameTelemetry.Clear();
         _countermeasureAdapter?.Dispose();
         _countermeasureAdapter = null;
         _gunTracerAdapter?.Dispose();

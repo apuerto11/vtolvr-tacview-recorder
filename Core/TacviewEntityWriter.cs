@@ -119,6 +119,11 @@ public sealed class TacviewEntityWriter : IDisposable
     private readonly HashSet<ulong> _seenFrameObjectIds = new HashSet<ulong>();
     private readonly HashSet<ulong> _frameUpsertObjectIds = new HashSet<ulong>();
     private readonly List<PendingCommit> _pendingCommits = new List<PendingCommit>();
+    private readonly Dictionary<ulong, TacviewTelemetry> _lastTelemetry =
+        new Dictionary<ulong, TacviewTelemetry>();
+    private readonly List<KeyValuePair<ulong, TacviewTelemetry>> _pendingTelemetry =
+        new List<KeyValuePair<ulong, TacviewTelemetry>>();
+    private readonly Func<ulong, bool> _isKnownOrCreatedThisFrame;
     private readonly StringBuilder _frame = new StringBuilder(4096);
     private bool _mapIdConfirmed;
     private bool _disposed;
@@ -156,6 +161,7 @@ public sealed class TacviewEntityWriter : IDisposable
         _writer = writer ?? throw new ArgumentNullException(nameof(writer));
         _fileMover = fileMover ?? throw new ArgumentNullException(nameof(fileMover));
         _mapIdSuppressor = mapIdSuppressor ?? throw new ArgumentNullException(nameof(mapIdSuppressor));
+        _isKnownOrCreatedThisFrame = IsKnownOrCreatedThisFrame;
         _leaveOpen = leaveOpen;
         _temporaryPath = temporaryPath;
         FinalPath = finalPath;
@@ -317,6 +323,7 @@ public sealed class TacviewEntityWriter : IDisposable
 
         _frame.Clear();
         _pendingCommits.Clear();
+        _pendingTelemetry.Clear();
         _frame.Append('#');
         _frame.Append(relativeTimeSeconds.ToString("0.000", Invariant));
         _frame.Append('\n');
@@ -468,12 +475,19 @@ public sealed class TacviewEntityWriter : IDisposable
 
     private void AppendUpsert(TacviewEntityUpdate update)
     {
+        if (update.IsTelemetryOnly)
+        {
+            AppendTelemetryOnly(update);
+            return;
+        }
+
         EntityMetadata metadata = FilterUnknownRelationships(update.Metadata);
         bool exists = _lastSnapshots.TryGetValue(update.ObjectId, out EntitySnapshot previous);
         bool transformChanged = !exists || !TransformsEquivalent(update.Transform, previous.Transform);
         bool metadataChanged = !exists || !MetadataEquals(metadata, previous.Metadata);
+        bool hasTelemetry = update.Telemetry != null;
 
-        if (!transformChanged && !metadataChanged)
+        if (!transformChanged && !metadataChanged && !hasTelemetry)
         {
             return;
         }
@@ -489,6 +503,23 @@ public sealed class TacviewEntityWriter : IDisposable
 
         AppendMetadata(metadata, exists ? previous.Metadata : null);
 
+        TacviewTelemetry telemetryState = null;
+        if (hasTelemetry)
+        {
+            ulong? metadataLockWritten =
+                metadata.LockedTargetObjectId.HasValue &&
+                metadata.LockedTargetObjectId != (exists ? previous.Metadata.LockedTargetObjectId : null)
+                    ? metadata.LockedTargetObjectId
+                    : null;
+            _lastTelemetry.TryGetValue(update.ObjectId, out TacviewTelemetry lastTelemetry);
+            telemetryState = TacviewTelemetryEncoder.AppendChanges(
+                _frame,
+                update.Telemetry,
+                lastTelemetry,
+                _isKnownOrCreatedThisFrame,
+                metadataLockWritten);
+        }
+
         if (!transformChanged && _frame.Length == lineStart + objectId.Length)
         {
             // Relationship and optional-text clearing semantics are not
@@ -498,9 +529,43 @@ public sealed class TacviewEntityWriter : IDisposable
         }
 
         _frame.Append('\n');
+        if (telemetryState != null)
+        {
+            _pendingTelemetry.Add(new KeyValuePair<ulong, TacviewTelemetry>(update.ObjectId, telemetryState));
+        }
+
+        // An unchanged transform keeps the last written one so sub-precision
+        // drift is still compared against what the file actually holds.
         _pendingCommits.Add(PendingCommit.Upsert(
             update.ObjectId,
-            new EntitySnapshot(update.Transform, metadata)));
+            new EntitySnapshot(transformChanged ? update.Transform : previous.Transform, metadata)));
+    }
+
+    private void AppendTelemetryOnly(TacviewEntityUpdate update)
+    {
+        if (!_lastSnapshots.ContainsKey(update.ObjectId))
+        {
+            // Not written yet: properties cannot precede the object's creation.
+            return;
+        }
+
+        int lineStart = _frame.Length;
+        string objectId = update.ObjectId.ToString("X", Invariant);
+        _frame.Append(objectId);
+        _lastTelemetry.TryGetValue(update.ObjectId, out TacviewTelemetry lastTelemetry);
+        TacviewTelemetry telemetryState = TacviewTelemetryEncoder.AppendChanges(
+            _frame,
+            update.Telemetry,
+            lastTelemetry,
+            _isKnownOrCreatedThisFrame);
+        if (_frame.Length == lineStart + objectId.Length)
+        {
+            _frame.Length = lineStart;
+            return;
+        }
+
+        _frame.Append('\n');
+        _pendingTelemetry.Add(new KeyValuePair<ulong, TacviewTelemetry>(update.ObjectId, telemetryState));
     }
 
     private EntityMetadata FilterUnknownRelationships(EntityMetadata metadata)
@@ -691,12 +756,19 @@ public sealed class TacviewEntityWriter : IDisposable
 
     private void CommitFrame()
     {
+        for (int index = 0; index < _pendingTelemetry.Count; index++)
+        {
+            _lastTelemetry[_pendingTelemetry[index].Key] = _pendingTelemetry[index].Value;
+        }
+
+        _pendingTelemetry.Clear();
         for (int index = 0; index < _pendingCommits.Count; index++)
         {
             PendingCommit commit = _pendingCommits[index];
             if (commit.IsDelete)
             {
                 _lastSnapshots.Remove(commit.ObjectId);
+                _lastTelemetry.Remove(commit.ObjectId);
                 _deletedObjectIds.Add(commit.ObjectId);
             }
             else
@@ -723,6 +795,13 @@ public sealed class TacviewEntityWriter : IDisposable
                 throw new ArgumentException(
                     "An ACMI frame cannot contain an object ID more than once.",
                     nameof(updates));
+            }
+
+            if (update.IsTelemetryOnly)
+            {
+                // Optional data: an unknown or already deleted object is
+                // skipped when the frame is written, never a frame failure.
+                continue;
             }
 
             if (_deletedObjectIds.Contains(update.ObjectId))

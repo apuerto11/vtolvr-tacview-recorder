@@ -3,6 +3,25 @@
 This file records intended community-visible changes. It does not mean that a
 version has been published.
 
+## Unreleased — Flight data (fork, untested in game)
+
+- New per-object ACMI properties: `IAS`, `TAS`, `Mach`, `AOA`, `AOS`, `AGL`,
+  `Throttle`, `FuelVolume` for aircraft; `LockedTarget`/`LockedTargetMode`
+  for radar locks of aircraft, ground units and ships; `RadarMode`,
+  `RadarRange`, `EngagementRange`, `VerticalEngagementRange` for ground units
+  and ships. Missile `LockedTarget` is now refreshed during flight.
+- Sampled at 2 Hz by default and written only when changed beyond a
+  per-property threshold.
+- `realtime.cfg`: `export_flight_data`, `export_engagement`, `export_sensors`,
+  `flight_data_rate_hz`. They apply to file recording too.
+- Mach and IAS are standard-atmosphere estimates. Several VTOL VR members are
+  read by name through reflection and are unverified (see README); a missing
+  member only disables that property.
+- Validation: 235 automated tests (15 new: encoding, thresholds, lock
+  release, merging, rate gate, atmosphere, settings); Core builds for
+  net472; the new adapter type-checks against API stubs. Not yet compiled
+  against the game assemblies nor run in game.
+
 ## Unreleased — Real-Time Telemetry (fork)
 
 - Tacview Real-Time Telemetry host: Tacview or a bridge can follow the mission

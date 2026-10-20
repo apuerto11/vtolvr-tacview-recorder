@@ -37,6 +37,21 @@ public sealed class TacviewRealtimeSettings
     /// <summary>Frames buffered per client before a slow client is dropped (~40 frames per second).</summary>
     public int MaxQueuedFrames { get; set; } = 2000;
 
+    /// <summary>
+    /// Aircraft flight data (IAS, TAS, Mach, AOA, AOS, AGL, Throttle,
+    /// FuelVolume). Applies to the .acmi file and the live stream alike.
+    /// </summary>
+    public bool ExportFlightData { get; set; } = true;
+
+    /// <summary>Radar locks (LockedTarget/LockedTargetMode) and in-flight missile retargeting.</summary>
+    public bool ExportEngagement { get; set; } = true;
+
+    /// <summary>RadarMode, RadarRange, EngagementRange, VerticalEngagementRange of ground units and ships.</summary>
+    public bool ExportSensors { get; set; } = true;
+
+    /// <summary>Sampling rate of the properties above (0.1 to 10 Hz). Values are written only when changed.</summary>
+    public double FlightDataRateHz { get; set; } = 2.0;
+
     public static string DefaultFileContent =>
         "# Tacview Real-Time Telemetry (VTOL VR Tacview recorder)\n" +
         "# Tacview, or a bridge such as tacv-acmi-bridge, can follow the mission live.\n" +
@@ -47,7 +62,13 @@ public sealed class TacviewRealtimeSettings
         "port=42674\n" +
         "# Leave empty for no password.\n" +
         "password=\n" +
-        "max_clients=4\n";
+        "max_clients=4\n" +
+        "# Extra per-object properties, in the .acmi file and the live stream (true/false).\n" +
+        "export_flight_data=true\n" +
+        "export_engagement=true\n" +
+        "export_sensors=true\n" +
+        "# Sampling rate of these properties; a value is written only when it changed.\n" +
+        "flight_data_rate_hz=2\n";
 
     /// <summary>
     /// Reads <paramref name="path"/>; creates it with defaults when missing.
@@ -137,6 +158,31 @@ public sealed class TacviewRealtimeSettings
                     }
 
                     break;
+                case "export_flight_data":
+                case "exportflightdata":
+                    settings.ExportFlightData = ParseBoolSetting(value, settings.ExportFlightData, index, key, warnings);
+                    break;
+                case "export_engagement":
+                case "exportengagement":
+                    settings.ExportEngagement = ParseBoolSetting(value, settings.ExportEngagement, index, key, warnings);
+                    break;
+                case "export_sensors":
+                case "exportsensors":
+                    settings.ExportSensors = ParseBoolSetting(value, settings.ExportSensors, index, key, warnings);
+                    break;
+                case "flight_data_rate_hz":
+                case "flightdataratehz":
+                    if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double rate) &&
+                        rate >= 0.1 && rate <= 10.0)
+                    {
+                        settings.FlightDataRateHz = rate;
+                    }
+                    else
+                    {
+                        warnings?.Add($"line {index + 1} ignored: {key} must be between 0.1 and 10");
+                    }
+
+                    break;
                 default:
                     warnings?.Add($"line {index + 1} ignored: unknown key '{key}'");
                     break;
@@ -144,6 +190,17 @@ public sealed class TacviewRealtimeSettings
         }
 
         return settings;
+    }
+
+    private static bool ParseBoolSetting(string value, bool current, int index, string key, List<string> warnings)
+    {
+        if (TryParseBool(value, out bool parsed))
+        {
+            return parsed;
+        }
+
+        warnings?.Add($"line {index + 1} ignored: {key} must be true or false");
+        return current;
     }
 
     private static bool TryParseBool(string value, out bool result)

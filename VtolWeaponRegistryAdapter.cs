@@ -105,6 +105,57 @@ internal sealed class VtolWeaponRegistryAdapter : IDisposable
         ProcessWeaponLifecycle(nowSeconds);
     }
 
+    /// <summary>
+    /// Re-resolves each live missile's guidance target (same game members as
+    /// at launch) and updates its LockedTarget when it changed, e.g. a
+    /// missile that acquires or switches targets after launch. A lost lock
+    /// keeps the last target: ACMI relationship clearing is not written.
+    /// </summary>
+    public void RefreshMissileTargets()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        foreach (TrackedWeapon weapon in _weapons.Values)
+        {
+            Missile missile = weapon.MissileInstance;
+            if (missile == null || weapon.HasPendingRemoval)
+            {
+                continue;
+            }
+
+            try
+            {
+                ulong? targetId = ResolveObjectId(ResolveMissileTarget(missile));
+                if (!targetId.HasValue || targetId == weapon.TargetObjectId)
+                {
+                    continue;
+                }
+
+                // Never re-register an identity the registry already dropped.
+                if (!_registry.TryGet(missile, out TrackedEntity entity) ||
+                    !ReferenceEquals(entity, weapon.Entity))
+                {
+                    continue;
+                }
+
+                EntityMetadata current = entity.Metadata;
+                _registry.Register(
+                    missile,
+                    entity.Kind,
+                    false,
+                    current.WithRelationships(current.ParentObjectId, targetId, current.NextObjectId));
+                weapon.TargetObjectId = targetId;
+            }
+            catch (Exception ex)
+            {
+                WarnThrottled($"Missile target refresh skipped: {ex.Message}");
+            }
+        }
+    }
+
     public void AppendSamplingTargetsTo(List<EntitySamplingTarget> destination)
     {
         if (destination == null)
@@ -979,7 +1030,9 @@ internal sealed class VtolWeaponRegistryAdapter : IDisposable
 
         public ulong? ParentObjectId { get; }
 
-        public ulong? TargetObjectId { get; }
+        public ulong? TargetObjectId { get; set; }
+
+        public Missile MissileInstance => _missile;
 
         public string Label { get; }
 

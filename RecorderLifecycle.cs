@@ -20,15 +20,20 @@ internal sealed class RecorderLifecycle : IDisposable
 
     private readonly MonoBehaviour _coroutineHost;
     private readonly TacviewRealtimeServer _realtimeServer;
+    private readonly TacviewRealtimeSettings _settings;
     private RecorderSession _activeSession;
     private IEnumerator _missionWaitRoutine;
     private bool _eventsSubscribed;
     private bool _disposed;
 
-    public RecorderLifecycle(MonoBehaviour coroutineHost, TacviewRealtimeServer realtimeServer = null)
+    public RecorderLifecycle(
+        MonoBehaviour coroutineHost,
+        TacviewRealtimeServer realtimeServer = null,
+        TacviewRealtimeSettings settings = null)
     {
         _coroutineHost = coroutineHost ?? throw new ArgumentNullException(nameof(coroutineHost));
         _realtimeServer = realtimeServer;
+        _settings = settings;
     }
 
     public void StartListening()
@@ -209,7 +214,7 @@ internal sealed class RecorderLifecycle : IDisposable
         }
 
         string missionName = GetMissionName(scenario);
-        var session = new RecorderSession(_coroutineHost, scene, scenario, missionName, mapManager, _realtimeServer);
+        var session = new RecorderSession(_coroutineHost, scene, scenario, missionName, mapManager, _realtimeServer, _settings);
 
         bool started;
         try

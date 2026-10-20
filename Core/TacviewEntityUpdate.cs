@@ -22,7 +22,9 @@ public readonly struct TacviewEntityUpdate
         EntityMetadata metadata,
         bool isDelete,
         TacviewEntityRemovalReason removalReason,
-        string removalLabel)
+        string removalLabel,
+        TacviewTelemetry telemetry = null,
+        bool isTelemetryOnly = false)
     {
         ObjectId = objectId;
         Transform = transform;
@@ -30,6 +32,8 @@ public readonly struct TacviewEntityUpdate
         IsDelete = isDelete;
         RemovalReason = removalReason;
         RemovalLabel = removalLabel;
+        Telemetry = telemetry;
+        IsTelemetryOnly = isTelemetryOnly;
     }
 
     public ulong ObjectId { get; }
@@ -43,6 +47,52 @@ public readonly struct TacviewEntityUpdate
     public TacviewEntityRemovalReason RemovalReason { get; }
 
     public string RemovalLabel { get; }
+
+    /// <summary>Optional flight/sensor/lock properties written with this update.</summary>
+    public TacviewTelemetry Telemetry { get; }
+
+    /// <summary>
+    /// Carries only <see cref="Telemetry"/> for an object already written;
+    /// no transform or metadata. Ignored when the object is not known yet.
+    /// </summary>
+    public bool IsTelemetryOnly { get; }
+
+    public static TacviewEntityUpdate TelemetryOnly(ulong objectId, TacviewTelemetry telemetry)
+    {
+        if (objectId == 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(objectId));
+        }
+
+        return new TacviewEntityUpdate(
+            objectId,
+            default,
+            null,
+            false,
+            TacviewEntityRemovalReason.Deleted,
+            null,
+            telemetry ?? throw new ArgumentNullException(nameof(telemetry)),
+            true);
+    }
+
+    /// <summary>Same update with <paramref name="telemetry"/> attached (deletes are returned unchanged).</summary>
+    public TacviewEntityUpdate WithTelemetry(TacviewTelemetry telemetry)
+    {
+        if (IsDelete)
+        {
+            return this;
+        }
+
+        return new TacviewEntityUpdate(
+            ObjectId,
+            Transform,
+            Metadata,
+            false,
+            RemovalReason,
+            RemovalLabel,
+            telemetry,
+            IsTelemetryOnly);
+    }
 
     public static TacviewEntityUpdate Upsert(
         ulong objectId,
